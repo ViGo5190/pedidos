@@ -8,6 +8,7 @@ require_once(__DIR__ . '/../src/system/request.php');
 require_once(__DIR__ . '/../src/system/cookie.php');
 require_once(__DIR__ . '/../src/system/session.php');
 require_once(__DIR__ . '/../src/system/template.php');
+require_once(__DIR__ . '/../src/system/mysql.php');
 
 function run()
 {
@@ -26,6 +27,8 @@ function run()
     sessionSetData('count', $count);
 
     $appName = configGetAll()['app']['name'];
+
+    $connection = mysqlGetConnection('read');
 
     echo compileTemplate(
         'test',
