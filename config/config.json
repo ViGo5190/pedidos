@@ -1,0 +1,19 @@
+{
+    "app": {
+        "name": "pedidos"
+    },
+    "dbs": {
+        "read": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        },
+        "write": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        }
+    }
+}

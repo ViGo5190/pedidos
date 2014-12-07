@@ -3,6 +3,7 @@
  * @author Stan Gumeniuk i@vigo.su
  */
 
+require_once(__DIR__ . '/../src/system/config.php');
 require_once(__DIR__ . '/../src/system/request.php');
 require_once(__DIR__ . '/../src/system/cookie.php');
 require_once(__DIR__ . '/../src/system/session.php');
@@ -24,11 +25,14 @@ function run()
 
     sessionSetData('count', $count);
 
+    $appName = configGetAll()['app']['name'];
+
     echo compileTemplate(
         'test',
         [
-            'name'  => $name,
-            'count' => $count,
+            'name'    => $name,
+            'count'   => $count,
+            'appName' => $appName,
         ]
     );
 }
