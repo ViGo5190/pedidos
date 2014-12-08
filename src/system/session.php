@@ -30,4 +30,10 @@ function sessionSetData($name, $value)
     $_SESSION[$name] = $value;
 }
 
+function sessionUnSetData($name)
+{
+    sessionStartSession();
+    unset($_SESSION[$name]);
+}
+
 

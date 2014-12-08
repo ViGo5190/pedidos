@@ -9,26 +9,26 @@ require_once(__DIR__ . '/../src/system/cookie.php');
 require_once(__DIR__ . '/../src/system/session.php');
 require_once(__DIR__ . '/../src/system/template.php');
 require_once(__DIR__ . '/../src/system/mysql.php');
+require_once(__DIR__ . '/../src/auth.php');
+require_once(__DIR__ . '/../src/user.php');
+
+
 
 function run()
 {
-    if (isset(requestGetGETData()['name'])) {
-        $name = requestGetGETData()['name'];
-        cookieSetCookie('name', $name);
-    } elseif (cookieGetByName('name')) {
-        $name = cookieGetByName('name');
-    } else {
-        $name = 'World';
+    if (!authCheckAuthorized()){
+        authRedirectToAuthPage();
     }
 
-    $count = (int) sessionGetAll()['count'];
+    $user = userGetUserByID(userGetUserIdFromSession());
+    $name = $user['username'];
+
+    $count = (int) sessionGetAll()['user_'.userGetUserIdFromSession() .'_count'];
     $count++;
 
-    sessionSetData('count', $count);
+    sessionSetData('user_'.userGetUserIdFromSession() .'_count', $count);
 
     $appName = configGetAll()['app']['name'];
-
-    $connection = mysqlGetConnection('read');
 
     echo compileTemplate(
         'test',
