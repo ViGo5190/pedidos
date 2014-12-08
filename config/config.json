@@ -20,6 +20,18 @@
             "db": "pedidos",
             "user": "pedidos",
             "password": "pedidos"
+        },
+        "order": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        },
+        "transaction": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
         }
     }
 }
