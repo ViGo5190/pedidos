@@ -23,10 +23,11 @@ function orderValidateOrderData($orderData = [])
 {
     $authorIdExist = isset($orderData['authorId']);
     $executorId = isset($orderData['executorId']);
+    $name = isset($orderData['name']);
     $describe = isset($orderData['describe']);
     $cost = isset($orderData['cost']);
 
-    return $authorIdExist && $executorId && $describe && $cost;
+    return $authorIdExist && $executorId && $describe && $cost && $name;
 }
 
 function orderCreateOrder($orderData)
@@ -37,7 +38,7 @@ function orderCreateOrder($orderData)
 
     $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_WRITE);
 
-    $query = 'INSERT INTO `order` (authorId,executorId,`describe`,cost,createdTime,status) VALUES (?,?,?,?,?,?)';
+    $query = 'INSERT INTO `order` (authorId,executorId,`describe`,cost,createdTime,status,`name`) VALUES (?,?,?,?,?,?,?)';
 
     $query_stmt = mysqli_prepare($connection, $query);
 
@@ -46,13 +47,14 @@ function orderCreateOrder($orderData)
 
     mysqli_stmt_bind_param(
         $query_stmt,
-        'iisiii',
+        'iisiiis',
         $orderData['authorId'],
         $orderData['executorId'],
         $orderData['describe'],
         $orderData['cost'],
         $time,
-        $status
+        $status,
+        $orderData['name']
     );
 
     $res = mysqli_stmt_execute($query_stmt);
@@ -92,6 +94,38 @@ function orderGetOrderIdsByStatus($status, $limit = 0, $offset = 0)
     return false;
 }
 
+function orderGetOrderIdsByAuthorIdAndStatus($authorId, $status = 0, $limit = 0, $offset = 0)
+{
+    $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_READ);
+    $query = 'select id from `order` where authorId=?';
+
+    if ($status === 0) {
+        $query_stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($query_stmt, 'i', $authorId);
+    } else {
+        $query .= ' and status=?';
+        $query_stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($query_stmt, 'ii', $authorId, $status);
+    }
+    mysqli_stmt_bind_result(
+        $query_stmt,
+        $orderId
+    );
+    $orderIds = [];
+    if (mysqli_stmt_execute($query_stmt)) {
+        mysqli_stmt_store_result($query_stmt);
+        if (mysqli_stmt_num_rows($query_stmt) > 0) {
+            while (mysqli_stmt_fetch($query_stmt)) {
+                $orderIds[] = $orderId;
+            }
+        }
+    }
+    if (count($orderIds) > 0) {
+        return $orderIds;
+    }
+    return false;
+}
+
 function orderGetOrdersByIds($orderIds = [])
 {
 
@@ -100,11 +134,12 @@ function orderGetOrdersByIds($orderIds = [])
     }
     $orderIdsString = implode(',', $orderIds);
     $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_READ);
-    $query = 'select id, authorId, executorId, `describe`, cost, createdTime,status,lastStatusChangedTimeCreation,lastStatusChangedTimeExecution  from `order` where id IN (' . $orderIdsString . ')';
+    $query = 'select id,name, authorId, executorId, `describe`, cost, createdTime,status,lastStatusChangedTimeCreation,lastStatusChangedTimeExecution  from `order` where id IN (' . $orderIdsString . ')';
     $query_stmt = mysqli_prepare($connection, $query);
     mysqli_stmt_bind_result(
         $query_stmt,
         $orderId,
+        $orderName,
         $orderAuthorId,
         $orderExecutorId,
         $orderDescribe,
@@ -122,6 +157,7 @@ function orderGetOrdersByIds($orderIds = [])
             while (mysqli_stmt_fetch($query_stmt)) {
                 $orders[] = [
                     'id'                             => $orderId,
+                    'name'                           => $orderName,
                     'authorId'                       => $orderAuthorId,
                     'executorId'                     => $orderExecutorId,
                     'describe'                       => $orderDescribe,
