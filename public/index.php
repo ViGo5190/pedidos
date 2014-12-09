@@ -27,8 +27,13 @@ function run()
     $user = userGetUserByID(userGetUserIdFromSession());
     $name = $user['username'];
 
-    $count = (int) sessionGetAll()['user_' . userGetUserIdFromSession() . '_count'];
-    $count++;
+    if (isset(sessionGetAll()['user_' . userGetUserIdFromSession() . '_count'])){
+        $count = (int) sessionGetAll()['user_' . userGetUserIdFromSession() . '_count'];
+        $count++;
+    } else {
+        $count = 0;
+    }
+
 
     sessionSetData('user_' . userGetUserIdFromSession() . '_count', $count);
 
