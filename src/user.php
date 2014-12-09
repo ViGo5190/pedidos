@@ -9,6 +9,8 @@ const PEDIDOS_DB_USER_READ = 'user';
 const PEDIDOS_DB_USER_WRITE = 'user';
 
 const PEDIDOS_DEFAULT_COMMISSION_PERCENTAGE = 10;
+const PEDIDOS_USER_TYPE_AUTHOR = 1;
+const PEDIDOS_USER_TYPE_EXECUTOR = 2;
 
 function userGetUserByID($id, $force = false)
 {

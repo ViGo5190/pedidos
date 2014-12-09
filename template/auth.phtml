@@ -1,17 +1,18 @@
-<html>
-<body>
-<div>
-    <div>
-        <?php  foreach ($errors as $error):?>
-            <?=$error?> <br/>
-        <?php endforeach; ?>
-    </div>
-    <form method="POST" action="auth.php">
-        <input type="text" name="username" value="<?=$typedName?>">
-        <input type="password" name="password">
-        <input type="submit">
+<div class="jumbotron">
+
+    <form action="/auth.php" method="post" class="form-signin">
+        <h2 class="form-signin-heading">Авторизация</h2>
+
+
+        <input id="username" type="text" name="username" value="<?=$typedName?>" class="form-control" placeholder="Пользователь" required="" autofocus="">
+
+        <input id="password" type="password" name="password" class="form-control" placeholder="Пароль" required="">
+
+        <p><input type="submit" value="Войти" class="btn btn-lg btn-primary btn-block"></p>
+        <div class="error">
+            <?php  foreach ($errors as $error):?>
+                <?=$error?> <br/>
+            <?php endforeach; ?>
+        </div>
     </form>
 </div>
-</body>
-
-</html>

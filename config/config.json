@@ -1,6 +1,6 @@
 {
     "app": {
-        "name": "pedidos"
+        "name": "Pedidos"
     },
     "dbs": {
         "read": {
