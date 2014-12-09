@@ -8,20 +8,12 @@ ini_set('display_errors', 1);
 
 require_once(__DIR__ . '/../src/loader.php');
 
+helpersMakePrivate();
+
 function run()
 {
-    if (!authCheckAuthorized()) {
-        authRedirectToAuthPage();
-    }
 
     if ((isset(requestGetGETData()['action'])) && (requestGetGETData()['action'] = 'create')) {
-
-//        $id = transactionCreateLoanMoneyToUser(3,100);
-//        if (transactionLockTransactionById($id)){
-//            if (accountLoanMoneyToUserByAccountId(3,100)){
-//                transactionExecuteTransactionById($id);
-//            }
-//        }
 
         $amount = 10;
         $orderData = [

@@ -8,12 +8,11 @@ ini_set('display_errors', 1);
 
 require_once(__DIR__ . '/../src/loader.php');
 
+helpersMakePrivate();
+
 
 function run()
 {
-    if (!authCheckAuthorized()) {
-        authRedirectToAuthPage();
-    }
 
     $user = userGetUserByID(userGetUserIdFromSession());
     $name = $user['username'];
