@@ -338,7 +338,7 @@ function clickButton(id){
                 return false;
             } else if (data.status == 1) {
                 if (data.data.orderId > 0) {
-                    addInfo('success', ' Заказ создан. Его номер: ' + data.data.orderId + '.');
+                    addInfo('success', ' Заказ выполнен! Вы заработали: ' + data.data.amount + '.');
                     self.form.find("#cost").val("");
                     self.form.find("#name").val("");
                     self.form.find("#desc").val("");
