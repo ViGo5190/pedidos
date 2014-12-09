@@ -14,11 +14,10 @@ const PEDIDOS_ORDER_MAX_LOCK_TIME = 60;
 const PEDIDOS_ORDER_STATUS_NEW = 1;
 const PEDIDOS_ORDER_STATUS_PROCEED_LOCK_MONEY = 2;
 const PEDIDOS_ORDER_STATUS_READY = 3;
-const PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_MONEY = 4;
-const PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_COMMISSION = 5;
-const PEDIDOS_ORDER_STATUS_DONE = 6;
-const PEDIDOS_ORDER_STATUS_FAILED = 7;
-const PEDIDOS_ORDER_STATUS_CANCELED = 8;
+const PEDIDOS_ORDER_STATUS_PROCEED = 4;
+const PEDIDOS_ORDER_STATUS_DONE = 5;
+const PEDIDOS_ORDER_STATUS_FAILED = 6;
+const PEDIDOS_ORDER_STATUS_CANCELED = 7;
 
 function orderValidateOrderData($orderData = [])
 {
@@ -61,18 +60,48 @@ function orderCreateOrder($orderData)
     return mysqli_stmt_insert_id($query_stmt);
 }
 
-function orderGetOrderById($orderId)
+function orderGetOrderIdsByStatus($status, $limit = 0, $offset = 0)
 {
-    $id = (int) $orderId;
-
     $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_READ);
+    $query = 'select id from `order` where status=?';
 
-    $query = 'select id, authorId, executorId, `describe`, cost, createdTime,status,lastStatusChangedTimeCreation,lastStatusChangedTimeExecution  from order where id=?';
+    if ($limit === 0) {
+        $query_stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($query_stmt, 'i', $status);
+    } else {
+        $query .= ' LIMIT ?,?';
+        $query_stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($query_stmt, 'iii', $status, $offset, $limit);
+    }
+    mysqli_stmt_bind_result(
+        $query_stmt,
+        $orderId
+    );
+    $orderIds = [];
+    if (mysqli_stmt_execute($query_stmt)) {
+        mysqli_stmt_store_result($query_stmt);
+        if (mysqli_stmt_num_rows($query_stmt) > 0) {
+            while (mysqli_stmt_fetch($query_stmt)) {
+                $orderIds[] = $orderId;
+            }
+        }
+    }
+    if (count($orderIds) > 0) {
+        return $orderIds;
+    }
+    return false;
+}
 
+function orderGetOrdersByIds($orderIds = [])
+{
+
+    if (count($orderIds) === 0) {
+        return false;
+    }
+    $orderIdsString = implode(',', $orderIds);
+    $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_READ);
+    $query = 'select id, authorId, executorId, `describe`, cost, createdTime,status,lastStatusChangedTimeCreation,lastStatusChangedTimeExecution  from `order` where id IN (' . $orderIdsString . ')';
     $query_stmt = mysqli_prepare($connection, $query);
-
-    mysqli_stmt_bind_param($query_stmt, 'i', $id);
-
     mysqli_stmt_bind_result(
         $query_stmt,
         $orderId,
@@ -87,7 +116,6 @@ function orderGetOrderById($orderId)
     );
 
     $orders = [];
-
     if (mysqli_stmt_execute($query_stmt)) {
         mysqli_stmt_store_result($query_stmt);
         if (mysqli_stmt_num_rows($query_stmt) > 0) {
@@ -107,11 +135,72 @@ function orderGetOrderById($orderId)
         }
     }
 
-    if (count($orders) === 1) {
-        $order = $orders[0];
-        return $order;
+    if (count($orders) > 0) {
+        return $orders;
     }
     return false;
+}
+
+function orderGetOrderById($orderId)
+{
+    $id = (int) $orderId;
+    $orders = orderGetOrdersByIds([$id]);
+    if (!$orders) {
+        return false;
+    }
+    if (count($orders) > 1) {
+        return false;
+    }
+
+    return array_shift($orders);
+
+//    $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_READ);
+//
+//    $query = 'select id, authorId, executorId, `describe`, cost, createdTime,status,lastStatusChangedTimeCreation,lastStatusChangedTimeExecution  from `order` where id=?';
+//
+//    $query_stmt = mysqli_prepare($connection, $query);
+//
+//    mysqli_stmt_bind_param($query_stmt, 'i', $id);
+//
+//    mysqli_stmt_bind_result(
+//        $query_stmt,
+//        $orderId,
+//        $orderAuthorId,
+//        $orderExecutorId,
+//        $orderDescribe,
+//        $orderCost,
+//        $orderCreatedTime,
+//        $orderStatus,
+//        $orderLastStatusChangedTimeCreation,
+//        $orderLastStatusChangedTimeExecution
+//    );
+//
+//    $orders = [];
+//
+//    if (mysqli_stmt_execute($query_stmt)) {
+//        mysqli_stmt_store_result($query_stmt);
+//        if (mysqli_stmt_num_rows($query_stmt) > 0) {
+//            while (mysqli_stmt_fetch($query_stmt)) {
+//                $orders[] = [
+//                    'id'                             => $orderId,
+//                    'authorId'                       => $orderAuthorId,
+//                    'executorId'                     => $orderExecutorId,
+//                    'describe'                       => $orderDescribe,
+//                    'cost'                           => $orderCost,
+//                    'createdTime'                    => $orderCreatedTime,
+//                    'status'                         => $orderStatus,
+//                    'lastStatusChangedTimeCreation'  => $orderLastStatusChangedTimeCreation,
+//                    'lastStatusChangedTimeExecution' => $orderLastStatusChangedTimeExecution,
+//                ];
+//            }
+//        }
+//    }
+//
+//    if (count($orders) === 1) {
+//        $order = $orders[0];
+//        return $order;
+//    }
+//    return false;
 }
 
 function orderSetStatusLockForProceedLockMoneyById($orderId)
@@ -170,12 +259,12 @@ function orderSetStatusReadyToExecuteById($orderId)
     }
 }
 
-function orderSetStatusProceedMoneyTransferById($orderId)
+function orderSetStatusProceed($orderId)
 {
     $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_WRITE);
     $query = 'UPDATE `order` SET status=?, `lastStatusChangedTimeExecution`=?  where status=? and id=?';
     $query_stmt = mysqli_prepare($connection, $query);
-    $statusProceedTransferMoney = PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_MONEY;
+    $statusProceed = PEDIDOS_ORDER_STATUS_PROCEED;
     $time = time();
     $statusReady = PEDIDOS_ORDER_STATUS_READY;
     $maxLockTime = PEDIDOS_ORDER_MAX_LOCK_TIME;
@@ -183,7 +272,7 @@ function orderSetStatusProceedMoneyTransferById($orderId)
     mysqli_stmt_bind_param(
         $query_stmt,
         'iiii',
-        $statusProceedTransferMoney,
+        $statusProceed,
         $time,
         $statusReady,
         $orderId
@@ -197,6 +286,11 @@ function orderSetStatusProceedMoneyTransferById($orderId)
     }
 }
 
+/**
+ * @deprecated
+ * @param $orderId
+ * @return bool
+ */
 function orderSetStatusTransferCommissionById($orderId)
 {
     $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_WRITE);
@@ -233,7 +327,7 @@ function orderSetStatusDoneById($orderId)
     $query_stmt = mysqli_prepare($connection, $query);
     $statusDone = PEDIDOS_ORDER_STATUS_DONE;
     $time = time();
-    $statusProceedTransferCommission = PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_COMMISSION;
+    $statusProceed = PEDIDOS_ORDER_STATUS_PROCEED;
     $maxLockTime = PEDIDOS_ORDER_MAX_LOCK_TIME;
 
     mysqli_stmt_bind_param(
@@ -241,7 +335,7 @@ function orderSetStatusDoneById($orderId)
         'iiiiii',
         $statusDone,
         $time,
-        $statusProceedTransferCommission,
+        $statusProceed,
         $maxLockTime,
         $time,
         $orderId

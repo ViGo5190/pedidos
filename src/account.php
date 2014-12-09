@@ -10,7 +10,7 @@ const PEDIDOS_DB_ACCOUNT_WRITE = 'account';
 
 const PEDIDOS_ACCOUNT_TYPE_USER = 1;
 const PEDIDOS_ACCOUNT_TYPE_TRANSFER = 2;
-const PEDIDOS_ACCOUNT_TYPE_SYSTEM = 3;
+const PEDIDOS_ACCOUNT_TYPE_COMMISSION = 3;
 
 //UPDATE `account` SET `balance`=IF(`id`=1, balance-100,IF(`id`=2,balance+100,balance)) WHERE id=1 or id=2
 
@@ -87,7 +87,7 @@ function accountGetTransferAccount()
 
     if (count($accounts) === 1) {
         $account = $accounts[0];
-        return $account;
+        return $account['id'];
     }
     return false;
 }
@@ -100,7 +100,7 @@ function accountGetCommissionAccount()
 
     $query_stmt = mysqli_prepare($connection, $query);
 
-    $type = PEDIDOS_ACCOUNT_TYPE_SYSTEM;
+    $type = PEDIDOS_ACCOUNT_TYPE_COMMISSION;
     mysqli_stmt_bind_param($query_stmt, 'i', $type);
 
     mysqli_stmt_bind_result($query_stmt, $accountId, $accountType, $accountBalance);
@@ -122,7 +122,7 @@ function accountGetCommissionAccount()
 
     if (count($accounts) === 1) {
         $account = $accounts[0];
-        return $account;
+        return $account['id'];
     }
     return false;
 }
