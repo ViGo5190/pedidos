@@ -11,6 +11,13 @@ function helpersMakePrivate()
     }
 }
 
+function helpersMakeApiPrivate()
+{
+    if (!authCheckAuthorized()) {
+        header('HTTP/1.0 401 Forbidden');
+    }
+}
+
 function helpersGetProjectName(){
     if (isset(configGetAll()['app']['name'])){
         return configGetAll()['app']['name'];
