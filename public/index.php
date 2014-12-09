@@ -10,53 +10,42 @@ require_once(__DIR__ . '/../src/loader.php');
 
 helpersMakePrivate();
 
-function makePageForAuthor(){
-    return "";
+function makePageForAuthor()
+{
+
+    $container = compileTemplate(
+        'orderCreateForm',
+        [
+            'typedCost' => '',
+            'typedDesc' => '',
+            'typedName' => ''
+        ]
+    );
+
+    $container .= "<div id=\"orders\" class=\"row text-center\"> </div>";
+    return $container;
 }
 
-function makePageForExecutor(){
-    return "";
+function makePageForExecutor()
+{
+    $container = "<div id=\"orders\" class=\"row text-center\"> </div>";
+    return $container;
 }
-
-
 
 function run()
 {
 
     $containerData = "";
     $user = userGetUserByID(userGetUserIdFromSession());
-    if ($user['type'] == PEDIDOS_USER_TYPE_AUTHOR ){
+    if ($user['type'] == PEDIDOS_USER_TYPE_AUTHOR) {
         $containerData = makePageForAuthor();
     }
 
-    if ($user['type'] == PEDIDOS_USER_TYPE_EXECUTOR ){
-        $containerData = makePageForAuthor();
+    if ($user['type'] == PEDIDOS_USER_TYPE_EXECUTOR) {
+        $containerData = makePageForExecutor();
     }
 
-//    $name = $user['username'];
-//
-//    if (isset(sessionGetAll()['user_' . userGetUserIdFromSession() . '_count'])){
-//        $count = (int) sessionGetAll()['user_' . userGetUserIdFromSession() . '_count'];
-//        $count++;
-//    } else {
-//        $count = 0;
-//    }
-//
-//
-//    sessionSetData('user_' . userGetUserIdFromSession() . '_count', $count);
-//
-//    $appName = configGetAll()['app']['name'];
-//
-//    $c = compileTemplate(
-//        'test',
-//        [
-//            'name'    => $name,
-//            'count'   => $count,
-//            'appName' => $appName,
-//        ]
-//    );
-
-    echo  compileTemplate(
+    echo compileTemplate(
         'layout',
         [
             'container' => $containerData,
