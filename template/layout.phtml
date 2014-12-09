@@ -71,7 +71,7 @@
                         <a><?=helpersGetCurrentUsername()?></a>
                     </li>
                     <li>
-                        <a>$<?=helpersGetCurrentUserBalance()?></a>
+                        <a>$<i id="pedidos-balance"><?=helpersGetCurrentUserBalance()?></i></a>
                     </li>
                     <li>
                         <a href="/logout.php"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
@@ -122,6 +122,10 @@
 
 <!-- Bootstrap Core JavaScript -->
 <script src="js/bootstrap.min.js"></script>
+
+<?php if (authCheckAuthorized()) :?>
+<script src="js/main.js"></script>
+<?php endif;?>
 
 </body>
 
