@@ -15,21 +15,10 @@ const PEDIDOS_ORDER_STATUS_NEW = 1;
 const PEDIDOS_ORDER_STATUS_PROCEED_LOCK_MONEY = 2;
 const PEDIDOS_ORDER_STATUS_READY = 3;
 const PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_MONEY = 4;
-const PEDIDOS_ORDER_STATUS_DONE = 5;
-const PEDIDOS_ORDER_STATUS_FAILED = 6;
-const PEDIDOS_ORDER_STATUS_CANCELED = 7;
-
-/**
- * id
- * authorId
- * executorId
- * describe
- * cost
- * createdTime
- * status
- * lastStatusChangedTimeCreation
- * lastStatusChangedTimeExecution
- */
+const PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_COMMISSION = 5;
+const PEDIDOS_ORDER_STATUS_DONE = 6;
+const PEDIDOS_ORDER_STATUS_FAILED = 7;
+const PEDIDOS_ORDER_STATUS_CANCELED = 8;
 
 function orderValidateOrderData($orderData = [])
 {
@@ -40,7 +29,6 @@ function orderValidateOrderData($orderData = [])
 
     return $authorIdExist && $executorId && $describe && $cost;
 }
-
 
 function orderCreateOrder($orderData)
 {
@@ -209,12 +197,12 @@ function orderSetStatusProceedMoneyTransferById($orderId)
     }
 }
 
-function orderSetStatusDoneById($orderId)
+function orderSetStatusTransferCommissionById($orderId)
 {
     $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_WRITE);
     $query = 'UPDATE `order` SET status=?, `lastStatusChangedTimeExecution`=?  where status=? and `lastStatusChangedTimeExecution`+?>?  and id=?';
     $query_stmt = mysqli_prepare($connection, $query);
-    $statusDone = PEDIDOS_ORDER_STATUS_DONE;
+    $statusTransferCommission = PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_COMMISSION;
     $time = time();
     $statusProceedTransferMoney = PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_MONEY;
     $maxLockTime = PEDIDOS_ORDER_MAX_LOCK_TIME;
@@ -222,9 +210,38 @@ function orderSetStatusDoneById($orderId)
     mysqli_stmt_bind_param(
         $query_stmt,
         'iiiiii',
-        $statusDone,
+        $statusTransferCommission,
         $time,
         $statusProceedTransferMoney,
+        $maxLockTime,
+        $time,
+        $orderId
+    );
+
+    $res = mysqli_stmt_execute($query_stmt);
+    if (mysqli_stmt_affected_rows($query_stmt) === 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function orderSetStatusDoneById($orderId)
+{
+    $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_WRITE);
+    $query = 'UPDATE `order` SET status=?, `lastStatusChangedTimeExecution`=?  where status=? and `lastStatusChangedTimeExecution`+?>?  and id=?';
+    $query_stmt = mysqli_prepare($connection, $query);
+    $statusDone = PEDIDOS_ORDER_STATUS_DONE;
+    $time = time();
+    $statusProceedTransferCommission = PEDIDOS_ORDER_STATUS_PROCEED_TRANSFER_COMMISSION;
+    $maxLockTime = PEDIDOS_ORDER_MAX_LOCK_TIME;
+
+    mysqli_stmt_bind_param(
+        $query_stmt,
+        'iiiiii',
+        $statusDone,
+        $time,
+        $statusProceedTransferCommission,
         $maxLockTime,
         $time,
         $orderId

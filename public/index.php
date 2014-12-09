@@ -3,7 +3,6 @@
  * @author Stan Gumeniuk i@vigo.su
  */
 
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -17,22 +16,21 @@ require_once(__DIR__ . '/../src/auth.php');
 require_once(__DIR__ . '/../src/user.php');
 require_once(__DIR__ . '/../src/transaction.php');
 require_once(__DIR__ . '/../src/order.php');
-
-
+require_once(__DIR__ . '/../src/account.php');
 
 function run()
 {
-    if (!authCheckAuthorized()){
+    if (!authCheckAuthorized()) {
         authRedirectToAuthPage();
     }
 
     $user = userGetUserByID(userGetUserIdFromSession());
     $name = $user['username'];
 
-    $count = (int) sessionGetAll()['user_'.userGetUserIdFromSession() .'_count'];
+    $count = (int) sessionGetAll()['user_' . userGetUserIdFromSession() . '_count'];
     $count++;
 
-    sessionSetData('user_'.userGetUserIdFromSession() .'_count', $count);
+    sessionSetData('user_' . userGetUserIdFromSession() . '_count', $count);
 
     $appName = configGetAll()['app']['name'];
 

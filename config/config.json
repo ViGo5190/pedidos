@@ -32,6 +32,12 @@
             "db": "pedidos",
             "user": "pedidos",
             "password": "pedidos"
+        },
+        "account": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
         }
     }
 }

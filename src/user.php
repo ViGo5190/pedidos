@@ -8,26 +8,27 @@ require_once(__DIR__ . '/system/mysql.php');
 const PEDIDOS_DB_USER_READ = 'user';
 const PEDIDOS_DB_USER_WRITE = 'user';
 
-function userGetUserByID($id,$force = false)
+const PEDIDOS_DEFAULT_COMMISSION_PERCENTAGE = 10;
+
+function userGetUserByID($id, $force = false)
 {
     static $userStore = [];
 
     $id = (int) $id;
 
-    if ((!$force) && (isset($userStore[$id]))){
+    if ((!$force) && (isset($userStore[$id]))) {
         return $userStore[$id];
     }
 
     $connection = mysqlGetConnection(PEDIDOS_DB_USER_READ);
 
-    $query = 'select id, username, email, `type`, balance, balanceLocked from user where id=?';
+    $query = 'select id, username, email, `type`, accountId from user where id=?';
 
     $query_stmt = mysqli_prepare($connection, $query);
 
     mysqli_stmt_bind_param($query_stmt, 'i', $id);
 
-    mysqli_stmt_bind_result($query_stmt, $userId, $userUsername, $userEmail, $userType, $userBalance,
-        $userBalanceLocked);
+    mysqli_stmt_bind_result($query_stmt, $userId, $userUsername, $userEmail, $userType, $userAccountId);
 
     $users = [];
 
@@ -40,8 +41,7 @@ function userGetUserByID($id,$force = false)
                     'username'      => $userUsername,
                     'email'         => $userEmail,
                     'type'          => $userType,
-                    'balance'       => $userBalance,
-                    'balanceLocked' => $userBalanceLocked,
+                    'accountId'       => $userAccountId,
                 ];
             }
         }
@@ -57,28 +57,26 @@ function userGetUserByID($id,$force = false)
 
 function userSaveUser($userData)
 {
-    if ($userData['id'] > 0){
+    if ($userData['id'] > 0) {
         $connection = mysqlGetConnection(PEDIDOS_DB_USER_WRITE);
 
-        $query = 'UPDATE user SET username=?, email=?, type=?, balance=?, balanceLocked=?  WHERE id=?';
+        $query = 'UPDATE user SET username=?, email=?, type=?, accountId=?  WHERE id=?';
 
         $query_stmt = mysqli_prepare($connection, $query);
 
         mysqli_stmt_bind_param(
             $query_stmt,
-            'ssiiii',
+            'ssiii',
             $userData['username'],
             $userData['email'],
             $userData['type'],
-            $userData['balance'],
-            $userData['balanceLocked'],
+            $userData['accountId'],
             $userData['id']
-            );
+        );
 
         $res = mysqli_stmt_execute($query_stmt);
 
         return $res;
-
     }
 }
 
@@ -129,25 +127,4 @@ function userGetUserIdFromSession()
     }
 
     return false;
-}
-
-
-function userLockMoneyByUserId($userId,$amount){
-    $connection = mysqlGetConnection(PEDIDOS_DB_USER_WRITE);
-    $query = 'UPDATE `user` SET balanceLocked=balanceLocked+? where id=?';
-    $query_stmt = mysqli_prepare($connection, $query);
-
-    mysqli_stmt_bind_param(
-        $query_stmt,
-        'ii',
-        $amount,
-        $userId
-    );
-
-    $res = mysqli_stmt_execute($query_stmt);
-    if (mysqli_stmt_affected_rows($query_stmt) === 1) {
-        return true;
-    } else {
-        return false;
-    }
 }
