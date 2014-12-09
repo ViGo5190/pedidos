@@ -27,7 +27,6 @@ PedidosCreateForm.prototype.init = function () {
         var e = self.form.find("#div-cost").find("#div-cost-error");
         e.empty();
         e.addClass('hidden');
-
         if (!self.isNumeric(cost)) {
             self.form.find("#div-cost").addClass('has-error').hide().fadeIn("slow");
             var e = self.form.find("#div-cost").find("#div-cost-error");
@@ -51,11 +50,24 @@ PedidosCreateForm.prototype.init = function () {
             url: '/api.php',
             context: this,
             async: false,
-            data: {action: 'createOrder', name: name, desc: desc, cost:cost},
+            data: {action: 'createOrder', name: name, desc: desc, cost: cost},
             success: function (data) {
-                if (data.data) {
-                    this.userInfo = data.data;
-                    console.log(this.userInfo);
+                if (data.status == 6) {
+                    self.form.find("#div-cost").addClass('has-error').hide().fadeIn("slow");
+                    var e = self.form.find("#div-cost").find("#div-cost-error");
+                    e.append("Не хватает денег!").hide().fadeIn("slow");
+                    e.removeClass('hidden');
+                    event.preventDefault();
+                    return false;
+                } else if (data.status == 1) {
+                    if (data.data.orderId > 0) {
+                        addInfo('success', ' Заказ создан. Его номер: ' + data.data.orderId + '.');
+                        self.form.find("#cost").val("");
+                        self.form.find("#name").val("");
+                        self.form.find("#desc").val("");
+                    }
+                } else {
+                    addInfo('error', ' Критическая ошибка! невозможно создать заказ.');
                 }
             },
             error: handleFailedAjax
@@ -87,9 +99,25 @@ PedidosOrderListForAuthor.prototype.renderOrders = function () {
             renderedOrdersIds.push(value.id);
             self.renderedOrdersIDs.push(value.id);
 
+            var statusDefault="alert-danger";
+            var statusDefaultText="Ошибка";
+
+
+            if (value.status == 1){
+                statusDefault = "alert-warning";
+                statusDefaultText = " Новый";
+            } else if (value.status == 3){
+                statusDefault = "alert-info";
+                statusDefaultText = " Готов к выполнению";
+            } else if(value.status == 5){
+                statusDefault = "alert-success";
+                statusDefaultText = " Выполнен";
+            }
+
             var orderTitle = $("<h3>" + value.name + "</h3>");
             var orderDesc = $("<p>" + value.describe + "</p>");
-            var orderCost = $("<p>" + value.cost + "</p>");
+            var orderCost = $("<p> Стоимость:  $" + value.cost + "</p>");
+            var orderStatus = $("<p class=\""+statusDefault+"\"> Статус: " + statusDefaultText + "</p>");
 
 
             var orderCaption = $("<div class=\"caption\"></div>");
@@ -99,14 +127,13 @@ PedidosOrderListForAuthor.prototype.renderOrders = function () {
             orderCaption.append(orderTitle);
             orderCaption.append(orderDesc);
             orderCaption.append(orderCost);
+            orderCaption.append(orderStatus);
 
             orderThumbnail.append(orderCaption);
             orderDev.append(orderThumbnail);
 
             orderDev.prependTo('#orders').hide().fadeIn("slow");
 
-            //$("<div class=\"col-md-3 col-sm-6 hero-feature\"><div class=\"thumbnail\"><div class=\"caption\"><h3>" + value.name + "</h3><p>" + value.describe + "</p><p>cost:"+value.cost+"</p><p>status:" + value.status + "</p></div></div></div>")
-            //    .prependTo('#orders').hide().fadeIn("slow");
         }
     });
 
@@ -151,14 +178,6 @@ PedidosOrderListExecutor.prototype.renderOrders = function () {
 
             orderDev.prependTo('#orders').hide().fadeIn("slow");
 
-            //
-            //$("<div class=\"col-md-3 col-sm-6 hero-feature\"></div>")
-            //    .append("<div class=\"thumbnail\"></div>")
-            //    .append("<h3>")
-            //    .prependTo('#orders').hide().fadeIn("slow");
-
-            //$("<div class=\"col-md-3 col-sm-6 hero-feature\"><div class=\"thumbnail\"><div class=\"caption\"><h3>" + value.name + "</h3><p>" + value.describe + "</p><p>cost:"+value.cost+"</p><p>status:" + value.status + "</p></div></div></div>")
-            //.prependTo('#orders').hide().fadeIn("slow");
         }
     });
 
@@ -178,7 +197,6 @@ PedidosObject.prototype.updateBalance = function () {
         url: '/api.php',
         data: {action: 'getBalance'},
         success: function (data) {
-            //$('#loading').hide();
             if (data) {
                 $('#pedidos-balance').html(data.data.balance)
             }
@@ -267,6 +285,33 @@ function handleFailedAjax(xhr) {
     }
 }
 
+function addInfo(type, text) {
+    var infos = $("#infos");
+
+    var button = $("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-hidden=\"true\">×</button>");
+    var i = $("<i class=\"fa fa-info-circle\"></i>");
+
+    var div = $("<div class=\"alert  alert-dismissable\"></div>");
+
+    var typeDefault = 'alert-info';
+    if (type == "warning") {
+        typeDefault = "alert-warning"
+    }
+    if (type == "error") {
+        typeDefault = "alert-danger"
+    }
+
+    if (type == "success") {
+        typeDefault = "alert-success"
+    }
+    div.append(button);
+    div.append(i);
+    div.append(text);
+    div.addClass(typeDefault);
+    div.appendTo(infos).hide().fadeIn("slow");
+
+}
+
 
 $(document).ready(function () {
     pedidos = new PedidosObject();
@@ -274,7 +319,6 @@ $(document).ready(function () {
     pedidos.loadOrders();
     pedidos.renderOrders();
     pedidos.updateBalance();
-
 
     window.setInterval(function () {
         pedidos.updateBalance();

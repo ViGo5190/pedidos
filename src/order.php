@@ -4,7 +4,7 @@
  */
 
 require_once(__DIR__ . '/system/mysql.php');
-require_once(__DIR__ . '/system/mysql.php');
+require_once(__DIR__ . '/helpers.php');
 
 const PEDIDOS_DB_ORDER_READ = 'order';
 const PEDIDOS_DB_ORDER_WRITE = 'order';
@@ -161,7 +161,7 @@ function orderGetOrdersByIds($orderIds = [])
                     'authorId'                       => $orderAuthorId,
                     'executorId'                     => $orderExecutorId,
                     'describe'                       => $orderDescribe,
-                    'cost'                           => $orderCost,
+                    'cost'                           => helpersMoneyConvertToDecimal($orderCost),
                     'createdTime'                    => $orderCreatedTime,
                     'status'                         => $orderStatus,
                     'lastStatusChangedTimeCreation'  => $orderLastStatusChangedTimeCreation,

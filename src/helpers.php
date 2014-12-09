@@ -26,11 +26,11 @@ function helpersGetProjectName(){
 }
 
 function helpersMoneyConvertToDecimal($money){
-    return (int)$money / 100;
+    return  ($money / 100);
 }
 
 function helpersMoneyConvertToINT($money){
-    return $money * 100;
+    return (int) ($money * 100);
 }
 
 function helpersGetCurrentUsername(){

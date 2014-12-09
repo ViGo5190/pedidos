@@ -21,6 +21,7 @@ function run()
             'executorId' => 2,
             'cost'       => $amount,
             'describe'   => 'somw info',
+            'name'  => 'order'
         ];
 
         $orderId = orderCreateOrder($orderData);
