@@ -1,0 +1,43 @@
+{
+    "app": {
+        "name": "Pedidos"
+    },
+    "dbs": {
+        "read": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        },
+        "write": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        },
+        "user": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        },
+        "order": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        },
+        "transaction": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        },
+        "account": {
+            "host": "localhost",
+            "db": "pedidos",
+            "user": "pedidos",
+            "password": "pedidos"
+        }
+    }
+}

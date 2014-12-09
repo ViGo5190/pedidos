@@ -1,0 +1,33 @@
+<div class="row">
+    <!--    <div class="jumbotron">-->
+    <div class="col-lg-4 text-center col-md-offset-4">
+
+
+
+        <form action="#" class="form" id="createForm">
+            <h2 class="form-signin-heading">Создание заказа</h2>
+
+            <div class="form-group" id="div-name">
+            <label for="name">Название</label>
+            <input id="name" type="text" name="name" value="<?= $typedName ?>" class="form-control"
+                   placeholder="название" required="" autofocus="">
+                </div>
+
+            <div class="form-group" id="div-cost">
+                <label for="cost">Стоимость</label>
+
+                <label class="control-label hidden" for="cost" id="div-cost-error"></label>
+<!--                <input type="text" class="form-control" id="inputError1">-->
+                <input id="cost" type="text" name="cost" value="<?= $typedCost ?>" class="form-control " placeholder="10"
+                       required="">
+            </div>
+            <div class="form-group" id="div-desc">
+            <label for="desc">Описание</label>
+            <textarea class="form-control" rows="5" id="desc" name="desc" required=""><?= $typedDesc ?></textarea>
+                </div>
+
+            <p><input type="submit" value="Создать" class="btn btn-lg btn-primary btn-block"></p>
+        </form>
+    </div>
+    <!--    </div>-->
+</div>
