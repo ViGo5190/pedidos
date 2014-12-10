@@ -16,7 +16,7 @@ function requestGetGETData()
     return $_GET;
 }
 
-function requestGetSEREVRData()
+function requestGetSERVERData()
 {
     return $_SERVER;
 }

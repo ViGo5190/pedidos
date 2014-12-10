@@ -15,3 +15,5 @@ require_once(__DIR__ . '/transaction.php');
 require_once(__DIR__ . '/order.php');
 require_once(__DIR__ . '/account.php');
 require_once(__DIR__ . '/helpers.php');
+require_once(__DIR__ . '/app.php');
+require_once(__DIR__ . '/secure.php');

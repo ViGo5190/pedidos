@@ -1,6 +1,8 @@
 {
     "app": {
-        "name": "Pedidos"
+        "name": "Pedidos",
+        "domain": "example.com",
+        "secure": false
     },
     "dbs": {
         "read": {

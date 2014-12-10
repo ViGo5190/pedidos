@@ -9,6 +9,7 @@ require_once(__DIR__ . '/system/request.php');
 const PEDIDOS_AUTH_SESSION_KEY_FOR_AUTHORIZED = 'pedidos_auth_is';
 const PEDIDOS_AUTH_SESSION_KEY_FOR_USER_ID = 'pedidos_auth_user_id';
 const PEDIDOS_AUTH_SESSION_KEY_FOR_REQUESTED_PAGE = 'pedidos_auth_requested_page';
+const PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN = 'pedidos_auth_token';
 
 function authCheckAuthorized()
 {
@@ -32,7 +33,7 @@ function authGetUserId()
 
 function authRedirectToAuthPage()
 {
-    $requestedPage = requestGetSEREVRData()[REQUEST_URI];
+    $requestedPage = requestGetSERVERData()[REQUEST_URI];
 
     sessionSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_REQUESTED_PAGE, $requestedPage);
 
@@ -49,6 +50,7 @@ function authRedirectAfterSuccessAuth($redirectToRequestedPage = true)
     } else {
         header('Location: /');
     }
+    die();
 }
 
 function authCheckAuth($username, $password)
@@ -63,12 +65,28 @@ function authCheckAuth($username, $password)
 
 function authSetAuthorized($userId)
 {
+    sessionSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN,authGenToken($userId));
     sessionSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_AUTHORIZED,1);
     sessionSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_USER_ID,$userId);
 }
 
 function authSetUnAuthorized()
 {
+    sessionUnSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN);
     sessionUnSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_AUTHORIZED);
     sessionUnSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_USER_ID);
+}
+
+function authGenToken($userId=0){
+    return sha1($userId . time());
+}
+
+function authGetToken(){
+        if (isset(sessionGetAll()[PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN])) {
+            return sessionGetAll()[PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN];
+        } else{
+            $token = authGenToken();
+            sessionSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN,authGenToken());
+            return $token;
+        }
 }
