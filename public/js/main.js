@@ -159,17 +159,19 @@ PedidosOrderListExecutor.prototype.renderOrders = function () {
             var orderDesc = $("<p>" + value.describe + "</p>");
             var orderCost = $("<p> Стоимость: $" + value.cost + "</p>");
             var orderButton = $("<button type=\"button\" class=\"btn btn-success order-make\" onclick=\"clickButton("+value.id+");\">Выполнить</button>");
+            var orderComission = $("<p class=\"small\">Коммиссия системы 10%</p>");
 
 
             var orderCaption = $("<div class=\"caption\"></div>");
             var orderThumbnail = $("<div class=\"thumbnail\"></div>")
             var orderDev = $("<div class=\"col-md-3 col-sm-6 hero-feature\" id=\"order"+value.id+"\"></div>")
 
-            orderCaption.append(orderTitle);
-            orderCaption.append(orderId);
-            orderCaption.append(orderDesc);
-            orderCaption.append(orderCost);
-            orderCaption.append(orderButton);
+            orderCaption.append(orderTitle)
+            .append(orderId)
+            .append(orderDesc)
+            .append(orderCost)
+            .append(orderComission)
+            .append(orderButton);
 
             orderThumbnail.append(orderCaption);
             orderDev.append(orderThumbnail);

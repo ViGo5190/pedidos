@@ -29,7 +29,7 @@ function run()
         }
     }
 
-    $c =  compileTemplate(
+    $container =  compileTemplate(
         'auth',
         [
             'errors'    => $errors,
@@ -40,7 +40,7 @@ function run()
     echo  compileTemplate(
         'layout',
         [
-            'container' => $c,
+            'container' => $container,
         ]
     );
 }
