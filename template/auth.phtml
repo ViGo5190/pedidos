@@ -9,6 +9,7 @@
         <input id="password" type="password" name="password" class="form-control" placeholder="Пароль" required="">
 
         <p><input type="submit" value="Войти" class="btn btn-lg btn-primary btn-block"></p>
+        <input type="hidden" value="<?=authGetToken()?>" name="pedidost">
         <div class="error">
             <?php  foreach ($errors as $error):?>
                 <?=$error?> <br/>
