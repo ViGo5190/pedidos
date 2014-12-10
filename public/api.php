@@ -180,7 +180,7 @@ function createOrder()
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if ($user['type'] != PEDIDOS_USER_TYPE_EXECUTOR) {
+    if ($user['type'] != PEDIDOS_USER_TYPE_AUTHOR) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_USER_TYPE_WRONG);
     }
 
