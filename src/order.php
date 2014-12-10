@@ -189,54 +189,6 @@ function orderGetOrderById($orderId)
     }
 
     return array_shift($orders);
-
-//    $connection = mysqlGetConnection(PEDIDOS_DB_ORDER_READ);
-//
-//    $query = 'select id, authorId, executorId, `describe`, cost, createdTime,status,lastStatusChangedTimeCreation,lastStatusChangedTimeExecution  from `order` where id=?';
-//
-//    $query_stmt = mysqli_prepare($connection, $query);
-//
-//    mysqli_stmt_bind_param($query_stmt, 'i', $id);
-//
-//    mysqli_stmt_bind_result(
-//        $query_stmt,
-//        $orderId,
-//        $orderAuthorId,
-//        $orderExecutorId,
-//        $orderDescribe,
-//        $orderCost,
-//        $orderCreatedTime,
-//        $orderStatus,
-//        $orderLastStatusChangedTimeCreation,
-//        $orderLastStatusChangedTimeExecution
-//    );
-//
-//    $orders = [];
-//
-//    if (mysqli_stmt_execute($query_stmt)) {
-//        mysqli_stmt_store_result($query_stmt);
-//        if (mysqli_stmt_num_rows($query_stmt) > 0) {
-//            while (mysqli_stmt_fetch($query_stmt)) {
-//                $orders[] = [
-//                    'id'                             => $orderId,
-//                    'authorId'                       => $orderAuthorId,
-//                    'executorId'                     => $orderExecutorId,
-//                    'describe'                       => $orderDescribe,
-//                    'cost'                           => $orderCost,
-//                    'createdTime'                    => $orderCreatedTime,
-//                    'status'                         => $orderStatus,
-//                    'lastStatusChangedTimeCreation'  => $orderLastStatusChangedTimeCreation,
-//                    'lastStatusChangedTimeExecution' => $orderLastStatusChangedTimeExecution,
-//                ];
-//            }
-//        }
-//    }
-//
-//    if (count($orders) === 1) {
-//        $order = $orders[0];
-//        return $order;
-//    }
-//    return false;
 }
 
 function orderSetStatusLockForProceedLockMoneyById($orderId)

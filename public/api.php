@@ -23,15 +23,15 @@ function makeOrder()
     if (!isset(requestGetGETData()['orderId'])) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_NOT_ENOUGH_FORM_DATA);
     }
-    $orderId=requestGetGETData()['orderId'];
+    $orderId = requestGetGETData()['orderId'];
 
     $order = orderGetOrderById($orderId);
 
-    if(!$order){
+    if (!$order) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if (!orderSetStatusProceed($orderId)){
+    if (!orderSetStatusProceed($orderId)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_CANNOT_PROCEED_ORDER_IT_PROCEEDING);
     }
     $userId = userGetUserIdFromSession();
@@ -51,100 +51,95 @@ function makeOrder()
 
     $amount = helpersMoneyConvertToINT($order['cost']);
 
-    $amountProceed = $amount * (100-PEDIDOS_DEFAULT_COMMISSION_PERCENTAGE)/100;
+    $amountProceed = $amount * (100 - PEDIDOS_DEFAULT_COMMISSION_PERCENTAGE) / 100;
     $amoutCommission = $amount - $amountProceed;
 
     $transferAccountId = accountGetTransferAccount();
     $comissionAccountId = accountGetCommissionAccount();
 
-
-
-
     $tr3Id = transactionCreateTransaction($transferAccountId,
-        PEDIDOS_TRANSACTION_TYPE_MINUS_MONEY_FROM_TRANSFER_ACCOUNT_FOR_TRANSFERRING_TO_USER_ACCOUNT, $amountProceed, $orderId);
+        PEDIDOS_TRANSACTION_TYPE_MINUS_MONEY_FROM_TRANSFER_ACCOUNT_FOR_TRANSFERRING_TO_USER_ACCOUNT, $amountProceed,
+        $orderId);
 
-    if (!$tr3Id){
+    if (!$tr3Id) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
     $tr4Id = transactionCreateTransaction($transferAccountId,
-        PEDIDOS_TRANSACTION_TYPE_MINUS_MONEY_FROM_TRANSFER_ACCOUNT_FOR_TRANSFERRING_TO_COMMISSION_ACCOUNT, $amoutCommission, $orderId);
-    if (!$tr4Id){
+        PEDIDOS_TRANSACTION_TYPE_MINUS_MONEY_FROM_TRANSFER_ACCOUNT_FOR_TRANSFERRING_TO_COMMISSION_ACCOUNT,
+        $amoutCommission, $orderId);
+    if (!$tr4Id) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
     $accountIdTo = $user['accountId'];
     $tr5Id = transactionCreateTransaction($accountIdTo,
-        PEDIDOS_TRANSACTION_TYPE_LOAN_MONEY_TO_USER_ACCOUNT_AFTER_TRANSFERRING_FROM_TRANSFER_ACCOUNT, $amountProceed, $orderId);
+        PEDIDOS_TRANSACTION_TYPE_LOAN_MONEY_TO_USER_ACCOUNT_AFTER_TRANSFERRING_FROM_TRANSFER_ACCOUNT, $amountProceed,
+        $orderId);
 
-    if (!$tr5Id){
+    if (!$tr5Id) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
     $tr6Id = transactionCreateTransaction($comissionAccountId,
-        PEDIDOS_TRANSACTION_TYPE_LOAN_MONEY_TO_COMMISSION_ACCOUNT_AFTER_TRANSFERRING_FROM_TRANSFER_ACCOUNT, $amoutCommission, $orderId);
+        PEDIDOS_TRANSACTION_TYPE_LOAN_MONEY_TO_COMMISSION_ACCOUNT_AFTER_TRANSFERRING_FROM_TRANSFER_ACCOUNT,
+        $amoutCommission, $orderId);
 
-    if (!$tr6Id){
+    if (!$tr6Id) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if (!transactionLockTransactionById($tr3Id)){
+    if (!transactionLockTransactionById($tr3Id)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
-//    var_dump($transferAccountId);
-//    var_dump($amountProceed);
-//    var_dump($tr3Id);
-//    die("ff");
-    if (!accountMinusMoneyFromAccount($transferAccountId,$amountProceed)){
+
+    if (!accountMinusMoneyFromAccount($transferAccountId, $amountProceed)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);;
     }
 
-
-    if (!transactionExecuteTransactionById($tr3Id)){
+    if (!transactionExecuteTransactionById($tr3Id)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-
-    if (!transactionLockTransactionById($tr4Id)){
+    if (!transactionLockTransactionById($tr4Id)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if (!accountMinusMoneyFromAccount($transferAccountId,$amoutCommission)){
+    if (!accountMinusMoneyFromAccount($transferAccountId, $amoutCommission)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if (!transactionExecuteTransactionById($tr4Id)){
+    if (!transactionExecuteTransactionById($tr4Id)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if (!transactionLockTransactionById($tr5Id)){
+    if (!transactionLockTransactionById($tr5Id)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if (!accountLoanMoneyAccount($accountIdTo,$amountProceed)){
+    if (!accountLoanMoneyAccount($accountIdTo, $amountProceed)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
-    if (!transactionExecuteTransactionById($tr5Id)){
-        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
-    }
-
-
-    if (!transactionLockTransactionById($tr6Id)){
-        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
-    }
-    if (!accountLoanMoneyAccount($comissionAccountId,$amoutCommission)){
+    if (!transactionExecuteTransactionById($tr5Id)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if (!transactionExecuteTransactionById($tr6Id)){
+    if (!transactionLockTransactionById($tr6Id)) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
+    }
+    if (!accountLoanMoneyAccount($comissionAccountId, $amoutCommission)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-
-    if (!orderSetStatusDoneById($orderId)){
+    if (!transactionExecuteTransactionById($tr6Id)) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    showResponce(PEDIDOS_API_ANSWER_STATUS_OK,['orderId' => $orderId, 'amount' => helpersMoneyConvertToDecimal($amountProceed)]);
+    if (!orderSetStatusDoneById($orderId)) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
+    }
+
+    showResponce(PEDIDOS_API_ANSWER_STATUS_OK,
+        ['orderId' => $orderId, 'amount' => helpersMoneyConvertToDecimal($amountProceed)]);
 }
 
 function createOrder()

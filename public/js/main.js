@@ -255,7 +255,6 @@ PedidosObject.prototype.loadOrders = function () {
         data: {action: 'loadOrders'},
         context: this,
         success: function (data) {
-            //$('#loading').hide();
             if (data.data) {
                 this.orders = data.data;
 
@@ -329,19 +328,13 @@ function clickButton(id){
         async: false,
         context: this,
         success: function (data) {
-            if (data.status == 6) {
-                self.form.find("#div-cost").addClass('has-error').hide().fadeIn("slow");
-                var e = self.form.find("#div-cost").find("#div-cost-error");
-                e.append("Не хватает денег!").hide().fadeIn("slow");
-                e.removeClass('hidden');
+            if (data.status == 9) {
+                addInfo('warning', ' Неудалось выполнить заказ. Возможно, он уже выполнен.');
                 event.preventDefault();
                 return false;
             } else if (data.status == 1) {
                 if (data.data.orderId > 0) {
-                    addInfo('success', ' Заказ выполнен! Вы заработали: ' + data.data.amount + '.');
-                    self.form.find("#cost").val("");
-                    self.form.find("#name").val("");
-                    self.form.find("#desc").val("");
+                    addInfo('success', ' Заказ выполнен! Вы заработали: $' + data.data.amount + '.');
                 }
             } else {
                 addInfo('error', ' Критическая ошибка! невозможно выполнить заказ.');
