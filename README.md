@@ -7,7 +7,7 @@ Mysql
 =====
 Dump in [config/mysqlDump/*.sql](config/mysqlDump/)
 
-config file in [config/config.js](config/config.js)
+config file in [config/config.js](config/config.json)
 
 Requirements
 ============
