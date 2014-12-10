@@ -14,6 +14,7 @@ const PEDIDOS_API_ANSWER_STATUS_NOT_ENOUGH_MONEY = 6;
 const PEDIDOS_API_ANSWER_STATUS_NOT_ENOUGH_FORM_DATA = 7;
 const PEDIDOS_API_ANSWER_STATUS_CANNOT_CREATE_ORDER = 8;
 const PEDIDOS_API_ANSWER_STATUS_CANNOT_PROCEED_ORDER_IT_PROCEEDING = 9;
+const PEDIDOS_API_ANSWER_STATUS_USER_TYPE_WRONG = 10;
 
 helpersMakeApiPrivate();
 
@@ -40,6 +41,10 @@ function makeOrder()
 
     if (!$user) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
+    }
+
+    if ($user['type']!=PEDIDOS_USER_TYPE_EXECUTOR){
+        showResponce(PEDIDOS_API_ANSWER_STATUS_USER_TYPE_WRONG);
     }
 
     if (!orderSetStatusProceed($orderId)) {
@@ -172,6 +177,10 @@ function createOrder()
 
     if (!$user) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
+    }
+
+    if ($user['type']!=PEDIDOS_USER_TYPE_EXECUTOR){
+        showResponce(PEDIDOS_API_ANSWER_STATUS_USER_TYPE_WRONG);
     }
 
     $account = accountGetAccountById($user['accountId']);
