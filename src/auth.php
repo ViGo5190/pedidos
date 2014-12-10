@@ -33,7 +33,7 @@ function authGetUserId()
 
 function authRedirectToAuthPage()
 {
-    $requestedPage = requestGetSEREVRData()[REQUEST_URI];
+    $requestedPage = requestGetSERVERData()[REQUEST_URI];
 
     sessionSetData(PEDIDOS_AUTH_SESSION_KEY_FOR_REQUESTED_PAGE, $requestedPage);
 

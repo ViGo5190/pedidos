@@ -50,6 +50,9 @@ PedidosCreateForm.prototype.init = function () {
             url: '/api.php',
             context: this,
             async: false,
+            headers: {
+                'X-Csrf-Token':pedidost
+            },
             data: {action: 'createOrder', name: name, desc: desc, cost: cost},
             success: function (data) {
                 if (data.status == 6) {
@@ -354,6 +357,9 @@ function clickButton(id) {
         data: {action: 'makeOrder', orderId: id},
         async: false,
         context: this,
+        headers: {
+            'X-Csrf-Token':pedidost
+        },
         success: function (data) {
             if (data.status == 9) {
                 addInfo('warning', ' Неудалось выполнить заказ. Возможно, он уже выполнен.');

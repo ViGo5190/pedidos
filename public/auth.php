@@ -5,9 +5,7 @@
 
 require_once(__DIR__ . '/../src/loader.php');
 securePreventFrame();
-
-$token = authGetToken();
-cookieSetCookie('pedidost', $token);
+secureSetToken();
 
 function run()
 {

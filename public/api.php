@@ -16,11 +16,32 @@ const PEDIDOS_API_ANSWER_STATUS_NOT_ENOUGH_FORM_DATA = 7;
 const PEDIDOS_API_ANSWER_STATUS_CANNOT_CREATE_ORDER = 8;
 const PEDIDOS_API_ANSWER_STATUS_CANNOT_PROCEED_ORDER_IT_PROCEEDING = 9;
 const PEDIDOS_API_ANSWER_STATUS_USER_TYPE_WRONG = 10;
+const PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE = 11;
 
 helpersMakeApiPrivate();
 
 function makeOrder()
 {
+
+    if (!isset(requestGetSERVERData()['HTTP_X_CSRF_TOKEN'])) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE);
+    }
+
+    if (!isset(cookieGetAll()[PEDIDOS_SECURE_TOKEN_COOKIE_NAME])) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE);
+    }
+
+    if (!isset(sessionGetAll()[PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN])) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE);
+    }
+
+    if (!
+    ((requestGetSERVERData()['HTTP_X_CSRF_TOKEN'] == cookieGetAll()[PEDIDOS_SECURE_TOKEN_COOKIE_NAME])
+        &&
+        (cookieGetAll()[PEDIDOS_SECURE_TOKEN_COOKIE_NAME] == sessionGetAll()[PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN])
+    )) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE);
+    }
 
     if (!isset(requestGetGETData()['orderId'])) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_NOT_ENOUGH_FORM_DATA);
@@ -152,6 +173,25 @@ function makeOrder()
 
 function createOrder()
 {
+    if (!isset(requestGetSERVERData()['HTTP_X_CSRF_TOKEN'])) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE);
+    }
+
+    if (!isset(cookieGetAll()[PEDIDOS_SECURE_TOKEN_COOKIE_NAME])) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE);
+    }
+
+    if (!isset(sessionGetAll()[PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN])) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE);
+    }
+
+    if (!
+    ((requestGetSERVERData()['HTTP_X_CSRF_TOKEN'] == cookieGetAll()[PEDIDOS_SECURE_TOKEN_COOKIE_NAME])
+        &&
+        (cookieGetAll()[PEDIDOS_SECURE_TOKEN_COOKIE_NAME] == sessionGetAll()[PEDIDOS_AUTH_SESSION_KEY_FOR_TOKEN])
+    )) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_SECURE);
+    }
 
     if (!isset(requestGetGETData()['name'])) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_NOT_ENOUGH_FORM_DATA);

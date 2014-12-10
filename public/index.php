@@ -8,6 +8,7 @@
 
 require_once(__DIR__ . '/../src/loader.php');
 securePreventFrame();
+secureSetToken();
 helpersMakePrivate();
 
 function makePageForAuthor()
