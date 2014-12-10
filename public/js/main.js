@@ -82,6 +82,7 @@ PedidosCreateForm.prototype.init = function () {
 function PedidosOrderListForAuthor() {
     this.orders = [];
     this.renderedOrdersIDs = [];
+    this.renderedOrdersStatus = [];
 }
 
 PedidosOrderListForAuthor.prototype.init = function (orders) {
@@ -96,30 +97,21 @@ PedidosOrderListForAuthor.prototype.renderOrders = function () {
             renderedOrdersIds.push(value.id);
             self.renderedOrdersIDs.push(value.id);
 
-            var statusDefault = "alert-danger";
-            var statusDefaultText = "Ошибка";
 
-
-            if (value.status == 1) {
-                statusDefault = "alert-warning";
-                statusDefaultText = " Новый";
-            } else if (value.status == 3) {
-                statusDefault = "alert-info";
-                statusDefaultText = " Готов к выполнению";
-            } else if (value.status == 5) {
-                statusDefault = "alert-success";
-                statusDefaultText = " Выполнен";
-            }
+            var status = {};
+            self.convertStatus(value.status, status);
+            var statusDefault = status.cssClass;
+            var statusDefaultText = status.msg;
 
             var orderTitle = $("<h3>" + value.name + "</h3>");
             var orderDesc = $("<p>" + value.describe + "</p>");
             var orderCost = $("<p> Стоимость:  $" + value.cost + "</p>");
-            var orderStatus = $("<p class=\"" + statusDefault + "\"> Статус: " + statusDefaultText + "</p>");
+            var orderStatus = $("<p id=\"order" + value.id + "-status\" class=\"" + statusDefault + "\"> Статус: " + statusDefaultText + "</p>");
 
 
             var orderCaption = $("<div class=\"caption\"></div>");
-            var orderThumbnail = $("<div class=\"thumbnail\"></div>")
-            var orderDev = $("<div class=\"col-md-3 col-sm-6 hero-feature\"></div>")
+            var orderThumbnail = $("<div class=\"thumbnail\"></div>");
+            var orderDev = $("<div class=\"col-md-3 col-sm-6 hero-feature\" id=\"order" + value.id + "\"></div>")
 
             orderCaption.append(orderTitle);
             orderCaption.append(orderDesc);
@@ -132,8 +124,41 @@ PedidosOrderListForAuthor.prototype.renderOrders = function () {
             orderDev.prependTo('#orders').hide().fadeIn("slow");
 
         }
+        if (self.renderedOrdersStatus[value.id] != value.status) {
+            var status = {};
+            self.convertStatus(value.status, status);
+            var statusDefault = status.cssClass;
+            var statusDefaultText = status.msg;
+
+
+            $('#order' + value.id + '-status').removeClass().addClass(statusDefault);
+            $('#order' + value.id + '-status').empty().append(statusDefaultText);
+        }
+
+
     });
 
+};
+
+PedidosOrderListForAuthor.prototype.convertStatus = function (status, st) {
+    var statusDefault = "alert-danger";
+    var statusDefaultText = "Ошибка";
+    if (status == 1) {
+        statusDefault = "alert-warning";
+        statusDefaultText = " Новый";
+    } else if (status == 3) {
+        statusDefault = "alert-info";
+        statusDefaultText = " Готов к выполнению";
+    } else if (status == 5) {
+        statusDefault = "alert-success";
+        statusDefaultText = " Выполнен";
+    }
+
+
+    st.cssClass = statusDefault;
+    st.msg = statusDefaultText;
+
+    //return ret;
 };
 
 
@@ -158,20 +183,20 @@ PedidosOrderListExecutor.prototype.renderOrders = function () {
             var orderId = $("<p>ID: <i class=\"orderid\">" + value.id + "</i></p>");
             var orderDesc = $("<p>" + value.describe + "</p>");
             var orderCost = $("<p> Стоимость: $" + value.cost + "</p>");
-            var orderButton = $("<button type=\"button\" class=\"btn btn-success order-make\" onclick=\"clickButton("+value.id+");\">Выполнить</button>");
+            var orderButton = $("<button type=\"button\" class=\"btn btn-success order-make\" onclick=\"clickButton(" + value.id + ");\">Выполнить</button>");
             var orderComission = $("<p class=\"small\">Коммиссия системы 10%</p>");
 
 
             var orderCaption = $("<div class=\"caption\"></div>");
             var orderThumbnail = $("<div class=\"thumbnail\"></div>")
-            var orderDev = $("<div class=\"col-md-3 col-sm-6 hero-feature\" id=\"order"+value.id+"\"></div>")
+            var orderDev = $("<div class=\"col-md-3 col-sm-6 hero-feature\" id=\"order" + value.id + "\"></div>")
 
             orderCaption.append(orderTitle)
-            .append(orderId)
-            .append(orderDesc)
-            .append(orderCost)
-            .append(orderComission)
-            .append(orderButton);
+                .append(orderId)
+                .append(orderDesc)
+                .append(orderCost)
+                .append(orderComission)
+                .append(orderButton);
 
             orderThumbnail.append(orderCaption);
             orderDev.append(orderThumbnail);
@@ -188,8 +213,8 @@ PedidosOrderListExecutor.prototype.renderOrders = function () {
     $.each(this.renderedOrdersIDs, function (index, value) {
         if ($.inArray(value, renderedOrdersIds) == -1) {
             self.renderedOrdersIDs.splice(index, 1);
-            $("#order"+value).fadeOut("slow");
-            $("#order"+value).remove();
+            $("#order" + value).fadeOut("slow");
+            $("#order" + value).remove();
         }
 
     });
@@ -322,11 +347,11 @@ function addInfo(type, text) {
 
 }
 
-function clickButton(id){
+function clickButton(id) {
     $.ajax({
         dataType: "json",
         url: '/api.php',
-        data: {action: 'makeOrder', orderId:id},
+        data: {action: 'makeOrder', orderId: id},
         async: false,
         context: this,
         success: function (data) {
