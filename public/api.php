@@ -31,9 +31,6 @@ function makeOrder()
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
 
-    if (!orderSetStatusProceed($orderId)) {
-        showResponce(PEDIDOS_API_ANSWER_STATUS_CANNOT_PROCEED_ORDER_IT_PROCEEDING);
-    }
     $userId = userGetUserIdFromSession();
     if (!$userId) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
@@ -44,6 +41,11 @@ function makeOrder()
     if (!$user) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);
     }
+
+    if (!orderSetStatusProceed($orderId)) {
+        showResponce(PEDIDOS_API_ANSWER_STATUS_CANNOT_PROCEED_ORDER_IT_PROCEEDING);
+    }
+
     $account = accountGetAccountById($user['accountId']);
     if (!$account) {
         showResponce(PEDIDOS_API_ANSWER_STATUS_ERROR_FATAL);

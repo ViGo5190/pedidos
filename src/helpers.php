@@ -15,6 +15,7 @@ function helpersMakeApiPrivate()
 {
     if (!authCheckAuthorized()) {
         header('HTTP/1.0 401 Forbidden');
+        die();
     }
 }
 
